@@ -25,8 +25,8 @@ export default Factory.extend({
     } else if (["CHECKBOX", "RADIO"].includes(question.type)) {
       const options = server.createList("option", 3);
 
-      options.forEach(
-        option => (option.slug = `${question.slug}-${option.slug}`)
+      options.forEach(option =>
+        option.update({ slug: `${question.slug}-${option.slug}` })
       );
 
       config.optionIds = options.map(({ id }) => id);

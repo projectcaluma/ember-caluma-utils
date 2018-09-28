@@ -1,5 +1,5 @@
 # source: http://localhost:8000/graphql
-# timestamp: Fri Sep 28 2018 13:05:46 GMT+0200 (CEST)
+# timestamp: Tue Oct 09 2018 11:12:27 GMT+0200 (CEST)
 
 input AddFormQuestionInput {
   form: ID!
@@ -101,8 +101,8 @@ type CheckboxQuestion implements Question & Node {
   modified: DateTime!
   slug: String!
   label: String!
-  isRequired: String!
-  isHidden: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString
   forms(
@@ -117,6 +117,15 @@ type CheckboxQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  options(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    slug: String
+    label: String
+    search: String
+  ): OptionConnection
 }
 
 input CompleteTaskInput {
@@ -192,8 +201,8 @@ type FloatQuestion implements Question & Node {
   modified: DateTime!
   slug: String!
   label: String!
-  isRequired: String!
-  isHidden: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString
   forms(
@@ -311,8 +320,8 @@ type IntegerQuestion implements Question & Node {
   modified: DateTime!
   slug: String!
   label: String!
-  isRequired: String!
-  isHidden: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString
   forms(
@@ -580,8 +589,8 @@ interface Question {
   modified: DateTime!
   slug: String!
   label: String!
-  isRequired: String!
-  isHidden: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString
   forms(
@@ -615,6 +624,11 @@ type QuestionEdge {
   cursor: String!
 }
 
+"""
+Question jexl represents a jexl expression returning boolean.
+"""
+scalar QuestionJexl
+
 type RadioQuestion implements Question & Node {
   """
   The ID of the object.
@@ -624,8 +638,8 @@ type RadioQuestion implements Question & Node {
   modified: DateTime!
   slug: String!
   label: String!
-  isRequired: String!
-  isHidden: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString
   forms(
@@ -640,6 +654,15 @@ type RadioQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  options(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    slug: String
+    label: String
+    search: String
+  ): OptionConnection
 }
 
 input RemoveFormQuestionInput {
@@ -687,9 +710,10 @@ type ReorderFormQuestionsPayload {
 input SaveCheckboxQuestionInput {
   slug: String!
   label: String!
-  isRequired: String
-  isHidden: String
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
   meta: JSONString
+  options: [ID]!
   clientMutationId: String
 }
 
@@ -764,8 +788,8 @@ type SaveDocumentStringAnswerPayload {
 input SaveFloatQuestionInput {
   slug: String!
   label: String!
-  isRequired: String
-  isHidden: String
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
   meta: JSONString
   minValue: Float
   maxValue: Float
@@ -793,8 +817,8 @@ type SaveFormPayload {
 input SaveIntegerQuestionInput {
   slug: String!
   label: String!
-  isRequired: String
-  isHidden: String
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
   meta: JSONString
   minValue: Int
   maxValue: Int
@@ -821,9 +845,10 @@ type SaveOptionPayload {
 input SaveRadioQuestionInput {
   slug: String!
   label: String!
-  isRequired: String
-  isHidden: String
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
   meta: JSONString
+  options: [ID]!
   clientMutationId: String
 }
 
@@ -848,8 +873,8 @@ type SaveTaskSpecificationPayload {
 input SaveTextareaQuestionInput {
   slug: String!
   label: String!
-  isRequired: String
-  isHidden: String
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
   meta: JSONString
   maxLength: Int
   clientMutationId: String
@@ -863,8 +888,8 @@ type SaveTextareaQuestionPayload {
 input SaveTextQuestionInput {
   slug: String!
   label: String!
-  isRequired: String
-  isHidden: String
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
   meta: JSONString
   maxLength: Int
   clientMutationId: String
@@ -1010,8 +1035,8 @@ type TextareaQuestion implements Question & Node {
   modified: DateTime!
   slug: String!
   label: String!
-  isRequired: String!
-  isHidden: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString
   forms(
@@ -1038,8 +1063,8 @@ type TextQuestion implements Question & Node {
   modified: DateTime!
   slug: String!
   label: String!
-  isRequired: String!
-  isHidden: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString
   forms(
