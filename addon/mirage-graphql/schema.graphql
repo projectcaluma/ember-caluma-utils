@@ -1,5 +1,5 @@
 # source: http://localhost:8000/graphql
-# timestamp: Tue Sep 25 2018 15:52:21 GMT+0200 (CEST)
+# timestamp: Fri Sep 28 2018 13:05:46 GMT+0200 (CEST)
 
 input AddFormQuestionInput {
   form: ID!
@@ -119,6 +119,16 @@ type CheckboxQuestion implements Question & Node {
   ): FormConnection
 }
 
+input CompleteTaskInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type CompleteTaskPayload {
+  task: Task
+  clientMutationId: String
+}
+
 """
 The `DateTime` scalar type represents a DateTime
 value as specified by
@@ -198,11 +208,13 @@ type FloatQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  minValue: Float
+  maxValue: Float
 }
 
 type Flow implements Node {
   taskSpecification: TaskSpecification!
-  next: FlowJexl
+  next: FlowJexl!
 
   """
   The ID of the object.
@@ -315,6 +327,8 @@ type IntegerQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  maxValue: Int
+  minValue: Int
 }
 
 """
@@ -356,6 +370,8 @@ type Mutation {
   archiveTaskSpecification(
     input: ArchiveTaskSpecificationInput!
   ): ArchiveTaskSpecificationPayload
+  startWorkflow(input: StartWorkflowInput!): StartWorkflowPayload
+  completeTask(input: CompleteTaskInput!): CompleteTaskPayload
   saveDocument(input: SaveDocumentInput!): SaveDocumentPayload
   saveDocumentStringAnswer(
     input: SaveDocumentStringAnswerInput!
@@ -377,6 +393,8 @@ type Mutation {
   reorderFormQuestions(
     input: ReorderFormQuestionsInput!
   ): ReorderFormQuestionsPayload
+  saveOption(input: SaveOptionInput!): SaveOptionPayload
+  removeOption(input: RemoveOptionInput!): RemoveOptionPayload
   saveTextQuestion(input: SaveTextQuestionInput!): SaveTextQuestionPayload
   saveTextareaQuestion(
     input: SaveTextareaQuestionInput!
@@ -400,6 +418,36 @@ interface Node {
   The ID of the object.
   """
   id: ID!
+}
+
+type Option implements Node {
+  created: DateTime!
+  modified: DateTime!
+  slug: String!
+  label: String!
+  meta: JSONString!
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+}
+
+type OptionConnection {
+  pageInfo: PageInfo!
+  edges: [OptionEdge]!
+}
+
+type OptionEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Option
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
 }
 
 type PageInfo {
@@ -469,6 +517,23 @@ type Query {
     isArchived: Boolean
     search: String
   ): TaskSpecificationConnection
+  allWorkflows(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    workflowSpecification: ID
+    status: String
+  ): WorkflowConnection
+  allTasks(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    status: String
+    taskSpecification: ID
+    workflow: ID
+  ): TaskConnection
   allDocuments(
     before: String
     after: String
@@ -588,6 +653,15 @@ type RemoveFormQuestionPayload {
   clientMutationId: String
 }
 
+input RemoveOptionInput {
+  option: ID
+  clientMutationId: String
+}
+
+type RemoveOptionPayload {
+  clientMutationId: String
+}
+
 input RemoveWorkflowSpecificationFlowInput {
   workflowSpecification: ID!
   taskSpecification: ID!
@@ -693,6 +767,8 @@ input SaveFloatQuestionInput {
   isRequired: String
   isHidden: String
   meta: JSONString
+  minValue: Float
+  maxValue: Float
   clientMutationId: String
 }
 
@@ -720,11 +796,25 @@ input SaveIntegerQuestionInput {
   isRequired: String
   isHidden: String
   meta: JSONString
+  minValue: Int
+  maxValue: Int
   clientMutationId: String
 }
 
 type SaveIntegerQuestionPayload {
   question: Question
+  clientMutationId: String
+}
+
+input SaveOptionInput {
+  slug: String!
+  label: String!
+  meta: JSONString
+  clientMutationId: String
+}
+
+type SaveOptionPayload {
+  option: Option
   clientMutationId: String
 }
 
@@ -761,6 +851,7 @@ input SaveTextareaQuestionInput {
   isRequired: String
   isHidden: String
   meta: JSONString
+  maxLength: Int
   clientMutationId: String
 }
 
@@ -775,6 +866,7 @@ input SaveTextQuestionInput {
   isRequired: String
   isHidden: String
   meta: JSONString
+  maxLength: Int
   clientMutationId: String
 }
 
@@ -797,6 +889,17 @@ type SaveWorkflowSpecificationPayload {
   clientMutationId: String
 }
 
+input StartWorkflowInput {
+  workflowSpecification: ID!
+  meta: JSONString
+  clientMutationId: String
+}
+
+type StartWorkflowPayload {
+  workflow: Workflow
+  clientMutationId: String
+}
+
 type StringAnswer implements Answer & Node {
   """
   The ID of the object.
@@ -807,6 +910,37 @@ type StringAnswer implements Answer & Node {
   question: Question!
   meta: JSONString
   value: String!
+}
+
+type Task implements Node {
+  created: DateTime!
+  modified: DateTime!
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+  taskSpecification: TaskSpecification!
+  workflow: Workflow!
+  status: TaskStatus!
+  meta: JSONString!
+}
+
+type TaskConnection {
+  pageInfo: PageInfo!
+  edges: [TaskEdge]!
+}
+
+type TaskEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Task
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
 }
 
 type TaskSpecification implements Node {
@@ -852,6 +986,21 @@ enum TaskSpecificationType {
   SIMPLE
 }
 
+"""
+An enumeration.
+"""
+enum TaskStatus {
+  """
+  Task is ready to be processed.
+  """
+  READY
+
+  """
+  Task is done.
+  """
+  COMPLETE
+}
+
 type TextareaQuestion implements Question & Node {
   """
   The ID of the object.
@@ -877,6 +1026,7 @@ type TextareaQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  maxLength: Int
 }
 
 type TextQuestion implements Question & Node {
@@ -904,6 +1054,38 @@ type TextQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  maxLength: Int
+}
+
+type Workflow implements Node {
+  created: DateTime!
+  modified: DateTime!
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+  workflowSpecification: WorkflowSpecification!
+  status: WorkflowStatus!
+  meta: JSONString!
+  tasks(before: String, after: String, first: Int, last: Int): TaskConnection
+}
+
+type WorkflowConnection {
+  pageInfo: PageInfo!
+  edges: [WorkflowEdge]!
+}
+
+type WorkflowEdge {
+  """
+  The item at the end of the edge
+  """
+  node: Workflow
+
+  """
+  A cursor for use in pagination
+  """
+  cursor: String!
 }
 
 type WorkflowSpecification implements Node {
@@ -945,4 +1127,19 @@ type WorkflowSpecificationEdge {
   A cursor for use in pagination
   """
   cursor: String!
+}
+
+"""
+An enumeration.
+"""
+enum WorkflowStatus {
+  """
+  Workflow is running and tasks need to be completed.
+  """
+  RUNNING
+
+  """
+  Workflow is done.
+  """
+  COMPLETE
 }
