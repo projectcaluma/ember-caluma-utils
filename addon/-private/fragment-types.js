@@ -15,10 +15,19 @@ export default {
             name: "Flow"
           },
           {
+            name: "Workflow"
+          },
+          {
+            name: "Task"
+          },
+          {
             name: "Document"
           },
           {
             name: "Form"
+          },
+          {
+            name: "Option"
           },
           {
             name: "TextQuestion"
