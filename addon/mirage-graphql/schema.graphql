@@ -1,5 +1,5 @@
 # source: http://localhost:8000/graphql
-# timestamp: Fri Sep 28 2018 13:05:46 GMT+0200 (CEST)
+# timestamp: Fri Sep 28 2018 13:28:30 GMT+0200 (CEST)
 
 input AddFormQuestionInput {
   form: ID!
@@ -117,6 +117,15 @@ type CheckboxQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  options(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    slug: String
+    label: String
+    search: String
+  ): OptionConnection
 }
 
 input CompleteTaskInput {
@@ -640,6 +649,15 @@ type RadioQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+  options(
+    before: String
+    after: String
+    first: Int
+    last: Int
+    slug: String
+    label: String
+    search: String
+  ): OptionConnection
 }
 
 input RemoveFormQuestionInput {
@@ -690,6 +708,7 @@ input SaveCheckboxQuestionInput {
   isRequired: String
   isHidden: String
   meta: JSONString
+  options: [ID]!
   clientMutationId: String
 }
 
@@ -824,6 +843,7 @@ input SaveRadioQuestionInput {
   isRequired: String
   isHidden: String
   meta: JSONString
+  options: [ID]!
   clientMutationId: String
 }
 
