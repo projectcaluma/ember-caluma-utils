@@ -6,25 +6,25 @@ export default {
         name: "Node",
         possibleTypes: [
           {
-            name: "WorkflowSpecification"
-          },
-          {
-            name: "TaskSpecification"
-          },
-          {
-            name: "Flow"
-          },
-          {
             name: "Workflow"
           },
           {
             name: "Task"
           },
           {
+            name: "Form"
+          },
+          {
+            name: "Flow"
+          },
+          {
+            name: "Case"
+          },
+          {
             name: "Document"
           },
           {
-            name: "Form"
+            name: "WorkItem"
           },
           {
             name: "Option"
