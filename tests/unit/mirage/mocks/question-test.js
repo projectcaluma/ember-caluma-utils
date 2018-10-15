@@ -268,15 +268,30 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
   test("can add radio question", async function(assert) {
     assert.expect(1);
 
+    const options = this.server.createList("option", 5);
+
     const res = await this.apollo.mutate({
       mutation: gql`
         mutation {
           saveRadioQuestion(
-            input: { slug: "test-question", label: "Test Question" }
+            input: {
+              slug: "test-question",
+              label: "Test Question",
+              options: ${JSON.stringify(options.map(({ slug }) => slug))}
+            }
           ) {
             question {
               slug
               label
+              ... on RadioQuestion {
+                options {
+                  edges {
+                    node {
+                      slug
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -286,22 +301,47 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
     assert.deepEqual(res.saveRadioQuestion.question, {
       __typename: "RadioQuestion",
       slug: "test-question",
-      label: "Test Question"
+      label: "Test Question",
+      options: {
+        __typename: "OptionConnection",
+        edges: options.map(({ slug }) => ({
+          __typename: "OptionEdge",
+          node: {
+            __typename: "Option",
+            slug
+          }
+        }))
+      }
     });
   });
 
   test("can add checkbox question", async function(assert) {
     assert.expect(1);
 
+    const options = this.server.createList("option", 5);
+
     const res = await this.apollo.mutate({
       mutation: gql`
         mutation {
           saveCheckboxQuestion(
-            input: { slug: "test-question", label: "Test Question" }
+            input: {
+              slug: "test-question",
+              label: "Test Question",
+              options: ${JSON.stringify(options.map(({ slug }) => slug))}
+            }
           ) {
             question {
               slug
               label
+              ... on CheckboxQuestion {
+                options {
+                  edges {
+                    node {
+                      slug
+                    }
+                  }
+                }
+              }
             }
           }
         }
@@ -311,7 +351,18 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
     assert.deepEqual(res.saveCheckboxQuestion.question, {
       __typename: "CheckboxQuestion",
       slug: "test-question",
-      label: "Test Question"
+      label: "Test Question",
+
+      options: {
+        __typename: "OptionConnection",
+        edges: options.map(({ slug }) => ({
+          __typename: "OptionEdge",
+          node: {
+            __typename: "Option",
+            slug
+          }
+        }))
+      }
     });
   });
 });
