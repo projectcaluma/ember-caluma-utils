@@ -1,5 +1,5 @@
 # source: http://localhost:8000/graphql
-# timestamp: Tue Oct 16 2018 09:52:45 GMT+0200 (CEST)
+# timestamp: Tue Oct 16 2018 16:52:52 GMT+0200 (CEST)
 
 input AddFormQuestionInput {
   form: ID!
@@ -621,6 +621,7 @@ type Query {
     last: Int
     form: ID
     search: String
+    id: ID
   ): DocumentConnection
 
   """
