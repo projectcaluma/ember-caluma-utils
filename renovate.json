@@ -1,0 +1,13 @@
+{
+  "extends": ["config:base"],
+  "packageRules": [
+    {
+      "packageNames": ["eslint-plugin-prettier"],
+      "matchCurrentVersion": "2.6.0"
+    },
+    {
+      "packageNames": ["ember-cli-babel"],
+      "matchCurrentVersion": "^6.17.0"
+    }
+  ]
+}
