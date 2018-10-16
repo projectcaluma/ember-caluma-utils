@@ -1,5 +1,5 @@
 # source: http://localhost:8000/graphql
-# timestamp: Mon Oct 15 2018 14:44:39 GMT+0200 (CEST)
+# timestamp: Tue Oct 16 2018 09:52:45 GMT+0200 (CEST)
 
 input AddFormQuestionInput {
   form: ID!
@@ -32,7 +32,7 @@ interface Answer {
   created: DateTime!
   modified: DateTime!
   question: Question!
-  meta: JSONString
+  meta: JSONString!
 }
 
 type AnswerConnection {
@@ -145,10 +145,6 @@ enum CaseStatus {
 }
 
 type CheckboxQuestion implements Question & Node {
-  """
-  The ID of the object.
-  """
-  id: ID!
   created: DateTime!
   modified: DateTime!
   slug: String!
@@ -156,7 +152,7 @@ type CheckboxQuestion implements Question & Node {
   isRequired: QuestionJexl!
   isHidden: QuestionJexl!
   isArchived: Boolean!
-  meta: JSONString
+  meta: JSONString!
   forms(
     before: String
     after: String
@@ -178,6 +174,11 @@ type CheckboxQuestion implements Question & Node {
     label: String
     search: String
   ): OptionConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
 }
 
 input CompleteWorkItemInput {
@@ -207,6 +208,8 @@ type Document implements Node {
     after: String
     first: Int
     last: Int
+    question: ID
+    search: String
   ): AnswerConnection
 
   """
@@ -233,22 +236,19 @@ type DocumentEdge {
 }
 
 type FloatAnswer implements Answer & Node {
+  created: DateTime!
+  modified: DateTime!
+
   """
   The ID of the object.
   """
   id: ID!
-  created: DateTime!
-  modified: DateTime!
   question: Question!
-  meta: JSONString
   value: Float!
+  meta: JSONString!
 }
 
 type FloatQuestion implements Question & Node {
-  """
-  The ID of the object.
-  """
-  id: ID!
   created: DateTime!
   modified: DateTime!
   slug: String!
@@ -256,7 +256,7 @@ type FloatQuestion implements Question & Node {
   isRequired: QuestionJexl!
   isHidden: QuestionJexl!
   isArchived: Boolean!
-  meta: JSONString
+  meta: JSONString!
   forms(
     before: String
     after: String
@@ -269,6 +269,11 @@ type FloatQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
   minValue: Float
   maxValue: Float
 }
@@ -314,11 +319,6 @@ type Form implements Node {
   meta: JSONString!
   isPublished: Boolean!
   isArchived: Boolean!
-
-  """
-  The ID of the object.
-  """
-  id: ID!
   questions(
     before: String
     after: String
@@ -332,6 +332,11 @@ type Form implements Node {
     excludeForms: [ID]
     search: String
   ): QuestionConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
 }
 
 type FormConnection {
@@ -352,22 +357,19 @@ type FormEdge {
 }
 
 type IntegerAnswer implements Answer & Node {
+  created: DateTime!
+  modified: DateTime!
+
   """
   The ID of the object.
   """
   id: ID!
-  created: DateTime!
-  modified: DateTime!
   question: Question!
-  meta: JSONString
   value: Int!
+  meta: JSONString!
 }
 
 type IntegerQuestion implements Question & Node {
-  """
-  The ID of the object.
-  """
-  id: ID!
   created: DateTime!
   modified: DateTime!
   slug: String!
@@ -375,7 +377,7 @@ type IntegerQuestion implements Question & Node {
   isRequired: QuestionJexl!
   isHidden: QuestionJexl!
   isArchived: Boolean!
-  meta: JSONString
+  meta: JSONString!
   forms(
     before: String
     after: String
@@ -388,6 +390,11 @@ type IntegerQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
   maxValue: Int
   minValue: Int
 }
@@ -398,15 +405,16 @@ JSON String
 scalar JSONString
 
 type ListAnswer implements Answer & Node {
+  created: DateTime!
+  modified: DateTime!
+
   """
   The ID of the object.
   """
   id: ID!
-  created: DateTime!
-  modified: DateTime!
   question: Question!
-  meta: JSONString
   value: [String]!
+  meta: JSONString!
 }
 
 type Mutation {
@@ -630,7 +638,7 @@ interface Question {
   isRequired: QuestionJexl!
   isHidden: QuestionJexl!
   isArchived: Boolean!
-  meta: JSONString
+  meta: JSONString!
   forms(
     before: String
     after: String
@@ -668,10 +676,6 @@ Question jexl represents a jexl expression returning boolean.
 scalar QuestionJexl
 
 type RadioQuestion implements Question & Node {
-  """
-  The ID of the object.
-  """
-  id: ID!
   created: DateTime!
   modified: DateTime!
   slug: String!
@@ -679,7 +683,7 @@ type RadioQuestion implements Question & Node {
   isRequired: QuestionJexl!
   isHidden: QuestionJexl!
   isArchived: Boolean!
-  meta: JSONString
+  meta: JSONString!
   forms(
     before: String
     after: String
@@ -701,6 +705,11 @@ type RadioQuestion implements Question & Node {
     label: String
     search: String
   ): OptionConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
 }
 
 input RemoveFormQuestionInput {
@@ -715,7 +724,7 @@ type RemoveFormQuestionPayload {
 }
 
 input RemoveOptionInput {
-  option: ID
+  option: ID!
   clientMutationId: String
 }
 
@@ -763,8 +772,8 @@ type SaveCheckboxQuestionPayload {
 input SaveDocumentFloatAnswerInput {
   question: ID!
   document: ID!
-  meta: JSONString!
   value: Float!
+  meta: JSONString
   clientMutationId: String
 }
 
@@ -782,8 +791,8 @@ input SaveDocumentInput {
 input SaveDocumentIntegerAnswerInput {
   question: ID!
   document: ID!
-  meta: JSONString!
   value: Int!
+  meta: JSONString
   clientMutationId: String
 }
 
@@ -795,8 +804,8 @@ type SaveDocumentIntegerAnswerPayload {
 input SaveDocumentListAnswerInput {
   question: ID!
   document: ID!
-  meta: JSONString!
   value: [String]!
+  meta: JSONString
   clientMutationId: String
 }
 
@@ -813,8 +822,8 @@ type SaveDocumentPayload {
 input SaveDocumentStringAnswerInput {
   question: ID!
   document: ID!
-  meta: JSONString!
   value: String!
+  meta: JSONString
   clientMutationId: String
 }
 
@@ -965,15 +974,16 @@ type StartCasePayload {
 }
 
 type StringAnswer implements Answer & Node {
+  created: DateTime!
+  modified: DateTime!
+
   """
   The ID of the object.
   """
   id: ID!
-  created: DateTime!
-  modified: DateTime!
   question: Question!
-  meta: JSONString
   value: String!
+  meta: JSONString!
 }
 
 type Task implements Node {
@@ -1020,10 +1030,6 @@ enum TaskType {
 }
 
 type TextareaQuestion implements Question & Node {
-  """
-  The ID of the object.
-  """
-  id: ID!
   created: DateTime!
   modified: DateTime!
   slug: String!
@@ -1031,7 +1037,7 @@ type TextareaQuestion implements Question & Node {
   isRequired: QuestionJexl!
   isHidden: QuestionJexl!
   isArchived: Boolean!
-  meta: JSONString
+  meta: JSONString!
   forms(
     before: String
     after: String
@@ -1044,14 +1050,15 @@ type TextareaQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
   maxLength: Int
 }
 
 type TextQuestion implements Question & Node {
-  """
-  The ID of the object.
-  """
-  id: ID!
   created: DateTime!
   modified: DateTime!
   slug: String!
@@ -1059,7 +1066,7 @@ type TextQuestion implements Question & Node {
   isRequired: QuestionJexl!
   isHidden: QuestionJexl!
   isArchived: Boolean!
-  meta: JSONString
+  meta: JSONString!
   forms(
     before: String
     after: String
@@ -1072,6 +1079,11 @@ type TextQuestion implements Question & Node {
     isArchived: Boolean
     search: String
   ): FormConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
   maxLength: Int
 }
 
