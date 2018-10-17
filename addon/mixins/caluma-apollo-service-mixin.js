@@ -17,7 +17,7 @@ export default Mixin.create({
         }),
         dataIdFromObject: obj => {
           if (obj.slug) {
-            Object.assign(obj, { _id: obj.slug });
+            obj = Object.assign({}, obj, { _id: obj.slug });
           }
 
           return defaultDataIdFromObject(obj);
