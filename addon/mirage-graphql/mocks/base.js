@@ -64,15 +64,15 @@ export default class {
 
   @register("{type}")
   handle(root, vars) {
+    const propKey = `${camelize(this.type)}Id`;
+    if (root && Object(root).hasOwnProperty(propKey)) {
+      vars = { id: root[propKey] };
+    }
+
     let record = this.filter.find(
       this.collection,
       this.serializer.deserialize(vars)
     );
-
-    const propKey = camelize(this.type);
-    if (root && Object(root).hasOwnProperty(propKey)) {
-      return root[propKey];
-    }
 
     return this.serializer.serialize(record);
   }

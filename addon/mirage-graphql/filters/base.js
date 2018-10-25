@@ -29,4 +29,14 @@ export default class {
   slug(records, value) {
     return records.filter(({ slug }) => slug === value);
   }
+
+  id(records, value) {
+    return records.filter(
+      ({ id, slug }) =>
+        id === value ||
+        slug === value ||
+        btoa(`${this.type}:${id}`) === value ||
+        btoa(`${this.type}:${slug}`) === value
+    );
+  }
 }

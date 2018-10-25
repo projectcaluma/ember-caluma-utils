@@ -365,4 +365,205 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
       }
     });
   });
+
+  test("can fetch questions via form and answers", async function(assert) {
+    assert.expect(2);
+
+    const form = this.server.create("form");
+
+    const textQuestion = this.server.create("question", {
+      type: "TEXT",
+      formIds: [form.id]
+    });
+    const textareaQuestion = this.server.create("question", {
+      type: "TEXTAREA",
+      formIds: [form.id]
+    });
+    const integerQuestion = this.server.create("question", {
+      type: "INTEGER",
+      formIds: [form.id]
+    });
+    const floatQuestion = this.server.create("question", {
+      type: "FLOAT",
+      formIds: [form.id]
+    });
+    const checkboxQuestion = this.server.create("question", {
+      type: "CHECKBOX",
+      formIds: [form.id]
+    });
+    const radioQuestion = this.server.create("question", {
+      type: "RADIO",
+      formIds: [form.id]
+    });
+
+    const document = this.server.create("document", { formId: form.id });
+
+    this.server.create("answer", {
+      documentId: document.id,
+      questionId: textQuestion.id
+    });
+    this.server.create("answer", {
+      documentId: document.id,
+      questionId: textareaQuestion.id
+    });
+    this.server.create("answer", {
+      documentId: document.id,
+      questionId: integerQuestion.id
+    });
+    this.server.create("answer", {
+      documentId: document.id,
+      questionId: floatQuestion.id
+    });
+    this.server.create("answer", {
+      documentId: document.id,
+      questionId: checkboxQuestion.id
+    });
+    this.server.create("answer", {
+      documentId: document.id,
+      questionId: radioQuestion.id
+    });
+
+    const res = await this.apollo.query({
+      query: gql`
+        query($id: ID!) {
+          allDocuments(id: $id) {
+            edges {
+              node {
+                answers {
+                  edges {
+                    node {
+                      question {
+                        slug
+                      }
+                    }
+                  }
+                }
+                form {
+                  slug
+                  questions {
+                    edges {
+                      node {
+                        slug
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `,
+      variables: {
+        id: document.id
+      }
+    });
+
+    assert.deepEqual(res.allDocuments.edges[0].node.answers.edges, [
+      {
+        __typename: "AnswerEdge",
+        node: {
+          __typename: "StringAnswer",
+          question: {
+            __typename: "TextQuestion",
+            slug: "question-4"
+          }
+        }
+      },
+      {
+        __typename: "AnswerEdge",
+        node: {
+          __typename: "StringAnswer",
+          question: {
+            __typename: "TextareaQuestion",
+            slug: "question-5"
+          }
+        }
+      },
+      {
+        __typename: "AnswerEdge",
+        node: {
+          __typename: "IntegerAnswer",
+          question: {
+            __typename: "IntegerQuestion",
+            slug: "question-6"
+          }
+        }
+      },
+      {
+        __typename: "AnswerEdge",
+        node: {
+          __typename: "FloatAnswer",
+          question: {
+            __typename: "FloatQuestion",
+            slug: "question-7"
+          }
+        }
+      },
+      {
+        __typename: "AnswerEdge",
+        node: {
+          __typename: "ListAnswer",
+          question: {
+            __typename: "CheckboxQuestion",
+            slug: "question-8"
+          }
+        }
+      },
+      {
+        __typename: "AnswerEdge",
+        node: {
+          __typename: "StringAnswer",
+          question: {
+            __typename: "RadioQuestion",
+            slug: "question-9"
+          }
+        }
+      }
+    ]);
+
+    assert.deepEqual(res.allDocuments.edges[0].node.form.questions.edges, [
+      {
+        __typename: "QuestionEdge",
+        node: {
+          __typename: "TextQuestion",
+          slug: "question-4"
+        }
+      },
+      {
+        __typename: "QuestionEdge",
+        node: {
+          __typename: "TextareaQuestion",
+          slug: "question-5"
+        }
+      },
+      {
+        __typename: "QuestionEdge",
+        node: {
+          __typename: "IntegerQuestion",
+          slug: "question-6"
+        }
+      },
+      {
+        __typename: "QuestionEdge",
+        node: {
+          __typename: "FloatQuestion",
+          slug: "question-7"
+        }
+      },
+      {
+        __typename: "QuestionEdge",
+        node: {
+          __typename: "CheckboxQuestion",
+          slug: "question-8"
+        }
+      },
+      {
+        __typename: "QuestionEdge",
+        node: {
+          __typename: "RadioQuestion",
+          slug: "question-9"
+        }
+      }
+    ]);
+  });
 });
