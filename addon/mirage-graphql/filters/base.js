@@ -31,6 +31,10 @@ export default class {
   }
 
   id(records, value) {
+    if (value === undefined || value === null) {
+      return [];
+    }
+
     return records.filter(
       ({ id, slug }) =>
         id === value ||

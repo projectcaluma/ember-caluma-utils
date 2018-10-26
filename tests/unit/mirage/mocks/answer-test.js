@@ -146,4 +146,212 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
       }
     ]);
   });
+
+  test("can save string answer", async function(assert) {
+    assert.expect(1);
+
+    const f = this.server.create("form");
+    const q = this.server.create("question", {
+      type: "TEXT",
+      formIds: [f.id]
+    });
+    const d = this.server.create("document", { formId: f.id });
+
+    const res = await this.apollo.mutate({
+      mutation: gql`
+        mutation {
+          saveDocumentStringAnswer(
+            input: { document: "${d.id}", question: "${q.slug}", value: "Test" }
+          ) {
+            answer {
+              ...on StringAnswer{
+                value
+              }
+              question {
+                slug
+              }
+            }
+          }
+        }
+      `
+    });
+
+    assert.deepEqual(res.saveDocumentStringAnswer.answer, {
+      value: "Test",
+      __typename: "StringAnswer",
+      question: {
+        slug: q.slug,
+        __typename: "TextQuestion"
+      }
+    });
+  });
+
+  test("can save integer answer", async function(assert) {
+    assert.expect(1);
+
+    const f = this.server.create("form");
+    const q = this.server.create("question", {
+      type: "INTEGER",
+      formIds: [f.id]
+    });
+    const d = this.server.create("document", { formId: f.id });
+
+    const res = await this.apollo.mutate({
+      mutation: gql`
+        mutation {
+          saveDocumentIntegerAnswer(
+            input: { document: "${d.id}", question: "${q.slug}", value: 5 }
+          ) {
+            answer {
+              ...on IntegerAnswer {
+                value
+              }
+              question {
+                slug
+              }
+            }
+          }
+        }
+      `
+    });
+
+    assert.deepEqual(res.saveDocumentIntegerAnswer.answer, {
+      value: 5,
+      __typename: "IntegerAnswer",
+      question: {
+        slug: q.slug,
+        __typename: "IntegerQuestion"
+      }
+    });
+  });
+
+  test("can save float answer", async function(assert) {
+    assert.expect(1);
+
+    const f = this.server.create("form");
+    const q = this.server.create("question", {
+      type: "FLOAT",
+      formIds: [f.id]
+    });
+    const d = this.server.create("document", { formId: f.id });
+
+    const res = await this.apollo.mutate({
+      mutation: gql`
+        mutation {
+          saveDocumentFloatAnswer(
+            input: { document: "${d.id}", question: "${q.slug}", value: 0.5 }
+          ) {
+            answer {
+              ...on FloatAnswer {
+                value
+              }
+              question {
+                slug
+              }
+            }
+          }
+        }
+      `
+    });
+
+    assert.deepEqual(res.saveDocumentFloatAnswer.answer, {
+      value: 0.5,
+      __typename: "FloatAnswer",
+      question: {
+        slug: q.slug,
+        __typename: "FloatQuestion"
+      }
+    });
+  });
+
+  test("can save list answer", async function(assert) {
+    assert.expect(1);
+
+    const f = this.server.create("form");
+    const q = this.server.create("question", {
+      type: "CHECKBOX",
+      formIds: [f.id]
+    });
+    const d = this.server.create("document", { formId: f.id });
+
+    const res = await this.apollo.mutate({
+      mutation: gql`
+        mutation {
+          saveDocumentListAnswer(
+            input: {
+              document: "${d.id}",
+              question: "${q.slug}",
+              value: [${q.options.models.map(o => `"${o.slug}"`).join(",")}]
+            }
+          ) {
+            answer {
+              ...on ListAnswer {
+                value
+              }
+              question {
+                slug
+              }
+            }
+          }
+        }
+      `
+    });
+
+    assert.deepEqual(res.saveDocumentListAnswer.answer, {
+      value: q.options.models.map(({ slug }) => slug),
+      __typename: "ListAnswer",
+      question: {
+        slug: q.slug,
+        __typename: "CheckboxQuestion"
+      }
+    });
+  });
+
+  test("can update an answer", async function(assert) {
+    assert.expect(1);
+
+    const f = this.server.create("form");
+    const q = this.server.create("question", {
+      type: "CHECKBOX",
+      formIds: [f.id]
+    });
+    const d = this.server.create("document", { formId: f.id });
+
+    this.server.create("answer", {
+      questionId: q.id,
+      documentId: d.id
+    });
+
+    const res = await this.apollo.mutate({
+      mutation: gql`
+        mutation {
+          saveDocumentListAnswer(
+            input: {
+              document: "${d.id}",
+              question: "${q.slug}",
+              value: [${q.options.models.map(o => `"${o.slug}"`).join(",")}]
+            }
+          ) {
+            answer {
+              ...on ListAnswer {
+                value
+              }
+              question {
+                slug
+              }
+            }
+          }
+        }
+      `
+    });
+
+    assert.deepEqual(res.saveDocumentListAnswer.answer, {
+      value: q.options.models.map(({ slug }) => slug),
+      __typename: "ListAnswer",
+      question: {
+        slug: q.slug,
+        __typename: "CheckboxQuestion"
+      }
+    });
+  });
 });

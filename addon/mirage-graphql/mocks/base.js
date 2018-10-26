@@ -81,16 +81,20 @@ export default class {
   handleSavePayload(
     _,
     {
-      input: { clientMutationId, slug, ...args }
+      input: { clientMutationId, slug, id, ...args }
     }
   ) {
-    const obj = this.filter.find(this.collection, { slug });
+    const identifier = slug ? { slug } : { id };
 
+    const obj = this.filter.find(this.collection, identifier);
     const res = obj
       ? this.collection.update(obj.id, args)
       : this.collection.insert(
           this.serializer.deserialize(
-            this.server.build(dasherize(this.type), { slug, ...args })
+            this.server.build(dasherize(this.type), {
+              ...identifier,
+              ...args
+            })
           )
         );
 
