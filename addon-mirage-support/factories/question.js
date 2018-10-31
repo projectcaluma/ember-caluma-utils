@@ -12,26 +12,37 @@ export default Factory.extend({
   meta: JSON.stringify({}),
 
   afterCreate(question, server) {
-    let config = {};
-
     if (["TEXT", "TEXTAREA"].includes(question.type)) {
-      config.maxLength = faker.random.number({ min: 1, max: 255 });
+      if (question.maxLength === undefined) {
+        question.update({
+          maxLength: faker.random.number({ min: 1, max: 255 })
+        });
+      }
     } else if (["INTEGER", "FLOAT"].includes(question.type)) {
-      config.minValue = faker.random.number({ min: 1, max: 100 });
-      config.maxValue = faker.random.number({
-        min: config.minValue + 1,
-        max: 1000
-      });
+      if (question.minValue === undefined) {
+        question.update({
+          minValue: faker.random.number({ min: 1, max: 100 })
+        });
+      }
+
+      if (question.maxValue === undefined) {
+        question.update({
+          maxValue: faker.random.number({
+            min: question.minValue + 1,
+            max: 1000
+          })
+        });
+      }
     } else if (["CHECKBOX", "RADIO"].includes(question.type)) {
-      const options = server.createList("option", 3);
+      if (question.optionIds.length === 0) {
+        const options = server.createList("option", 3);
 
-      options.forEach(option =>
-        option.update({ slug: `${question.slug}-${option.slug}` })
-      );
+        options.forEach(option =>
+          option.update({ slug: `${question.slug}-${option.slug}` })
+        );
 
-      config.optionIds = options.map(({ id }) => id);
+        question.update({ optionIds: options.map(({ id }) => id) });
+      }
     }
-
-    question.update(config);
   }
 });
