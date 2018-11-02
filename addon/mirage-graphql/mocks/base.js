@@ -64,9 +64,16 @@ export default class {
 
   @register("{type}")
   handle(root, vars) {
-    const propKey = `${camelize(this.type)}Id`;
-    if (root && Object(root).hasOwnProperty(propKey)) {
-      vars = { id: root[propKey] };
+    // If the parent node already resolved this branch in the graph, return it
+    // directly without mocking it
+    if (root && Object(root).hasOwnProperty(camelize(this.type))) {
+      return root[camelize(this.type)];
+    }
+
+    // If the parent node provides an ID for this relation, filter our mock data
+    // with that given ID
+    if (root && Object(root).hasOwnProperty(`${camelize(this.type)}Id`)) {
+      vars = { id: root[`${camelize(this.type)}Id`] };
     }
 
     let record = this.filter.find(
@@ -98,9 +105,11 @@ export default class {
           )
         );
 
-    return {
+    const x = {
       [camelize(this.type)]: this.serializer.serialize(res),
       clientMutationId
     };
+
+    return x;
   }
 }
