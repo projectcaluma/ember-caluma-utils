@@ -26,7 +26,7 @@
     "ember-apollo-client": "2.0.0-beta.1",
     "ember-auto-import": "1.2.15",
     "ember-changeset": "1.5.0",
-    "ember-cli-babel": "6.17.2",
+    "ember-cli-babel": "6.18.0",
     "ember-fetch": "6.1.0",
     "graphql": "14.0.2",
     "graphql-tools": "4.0.3",
