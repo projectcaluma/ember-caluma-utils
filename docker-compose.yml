@@ -6,7 +6,7 @@ services:
       - POSTGRES_USER=caluma
       - POSTGRES_PASSWORD=caluma
   caluma:
-    image: projectcaluma/caluma:latest@sha256:b57a93a0689d2a744d412a0038de01c6981f9736af3ff442efb369a83e36b465
+    image: projectcaluma/caluma:latest@sha256:4c51f62055495a246709fd1d3fd439fc77a440da8b66dfd5e06e87b027f20abe
     ports:
       - "8000:80"
     depends_on:
