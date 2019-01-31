@@ -1,6 +1,6 @@
 # ember-caluma-utils
 
-[Short description of the addon.]
+This addon provides some common utilities for Ember.js-based frontends for Caluma.
 
 ## Installation
 
@@ -10,7 +10,12 @@ ember install ember-caluma-utils
 
 ## Usage
 
-[Longer description of how to use the addon in apps.]
+The addon includes a mirage server for mocking Caluma's GraphQL API, which is generated from the GraphQL schema definition. To update the schema, run
+
+```bash
+yarn update-schema
+yarn fragment-types
+```
 
 ## Contributing
 

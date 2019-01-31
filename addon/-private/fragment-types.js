@@ -9,9 +9,6 @@ export default {
             name: "Workflow"
           },
           {
-            name: "Task"
-          },
-          {
             name: "Form"
           },
           {
@@ -48,6 +45,9 @@ export default {
             name: "IntegerQuestion"
           },
           {
+            name: "TableQuestion"
+          },
+          {
             name: "StringAnswer"
           },
           {
@@ -58,6 +58,33 @@ export default {
           },
           {
             name: "FloatAnswer"
+          },
+          {
+            name: "TableAnswer"
+          },
+          {
+            name: "SimpleTask"
+          },
+          {
+            name: "CompleteWorkflowFormTask"
+          },
+          {
+            name: "CompleteTaskFormTask"
+          }
+        ]
+      },
+      {
+        kind: "INTERFACE",
+        name: "Task",
+        possibleTypes: [
+          {
+            name: "SimpleTask"
+          },
+          {
+            name: "CompleteWorkflowFormTask"
+          },
+          {
+            name: "CompleteTaskFormTask"
           }
         ]
       },
@@ -82,6 +109,9 @@ export default {
           },
           {
             name: "IntegerQuestion"
+          },
+          {
+            name: "TableQuestion"
           }
         ]
       },
@@ -100,6 +130,9 @@ export default {
           },
           {
             name: "FloatAnswer"
+          },
+          {
+            name: "TableAnswer"
           }
         ]
       }
