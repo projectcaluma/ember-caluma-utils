@@ -1,5 +1,5 @@
 # source: http://localhost:8000/graphql
-# timestamp: Tue Oct 16 2018 16:52:52 GMT+0200 (CEST)
+# timestamp: Thu Jan 31 2019 15:43:42 GMT+0100 (Central European Standard Time)
 
 input AddFormQuestionInput {
   form: ID!
@@ -17,7 +17,7 @@ type AddFormQuestionPayload {
 
 input AddWorkflowFlowInput {
   workflow: ID!
-  task: ID!
+  tasks: [ID]!
   next: FlowJexl!
   clientMutationId: String
 }
@@ -29,8 +29,10 @@ type AddWorkflowFlowPayload {
 
 interface Answer {
   id: ID
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+  modifiedAt: DateTime!
   question: Question!
   meta: JSONString!
 }
@@ -50,6 +52,51 @@ type AnswerEdge {
   A cursor for use in pagination
   """
   cursor: String!
+}
+
+"""
+An enumeration.
+"""
+enum AnswerOrdering {
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
 }
 
 input ArchiveFormInput {
@@ -92,9 +139,21 @@ type ArchiveWorkflowPayload {
   clientMutationId: String
 }
 
+input CancelCaseInput {
+  id: ID!
+  clientMutationId: String
+}
+
+type CancelCasePayload {
+  case: Case
+  clientMutationId: String
+}
+
 type Case implements Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
@@ -109,7 +168,20 @@ type Case implements Node {
     after: String
     first: Int
     last: Int
+
+    """
+    WorkItemStatusArgument
+    """
+    status: WorkItemStatusArgument
+    task: ID
+    case: ID
+
+    """
+    WorkItemOrdering
+    """
+    orderBy: [WorkItemOrdering]
   ): WorkItemConnection
+  parentWorkItem: WorkItem
 }
 
 type CaseConnection {
@@ -132,6 +204,61 @@ type CaseEdge {
 """
 An enumeration.
 """
+enum CaseOrdering {
+  """
+  Status
+  """
+  STATUS_ASC
+
+  """
+  Status (descending)
+  """
+  STATUS_DESC
+
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
+}
+
+"""
+An enumeration.
+"""
 enum CaseStatus {
   """
   Case is running and work items need to be completed.
@@ -141,12 +268,39 @@ enum CaseStatus {
   """
   Case is done.
   """
-  COMPLETE
+  COMPLETED
+
+  """
+  Case is cancelled.
+  """
+  CANCELED
+}
+
+"""
+An enumeration.
+"""
+enum CaseStatusArgument {
+  """
+  Case is running and work items need to be completed.
+  """
+  RUNNING
+
+  """
+  Case is done.
+  """
+  COMPLETED
+
+  """
+  Case is cancelled.
+  """
+  CANCELED
 }
 
 type CheckboxQuestion implements Question & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   isRequired: QuestionJexl!
@@ -158,6 +312,11 @@ type CheckboxQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
     slug: String
     name: String
     description: String
@@ -170,10 +329,54 @@ type CheckboxQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+
+    """
+    OptionOrdering
+    """
+    orderBy: [OptionOrdering]
     slug: String
     label: String
     search: String
   ): OptionConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+}
+
+type CompleteTaskFormTask implements Task & Node {
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+  slug: String!
+  name: String!
+  description: String
+  type: TaskType!
+  meta: JSONString!
+  addressGroups: GroupJexl
+  isArchived: Boolean!
+  form: Form!
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+}
+
+type CompleteWorkflowFormTask implements Task & Node {
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+  slug: String!
+  name: String!
+  description: String
+  type: TaskType!
+  meta: JSONString!
+  addressGroups: GroupJexl
+  isArchived: Boolean!
 
   """
   The ID of the object.
@@ -199,8 +402,15 @@ value as specified by
 scalar DateTime
 
 type Document implements Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+
+  """
+  The ID of the object.
+  """
+  id: ID!
   form: Form!
   meta: JSONString!
   answers(
@@ -210,12 +420,14 @@ type Document implements Node {
     last: Int
     question: ID
     search: String
-  ): AnswerConnection
 
-  """
-  The ID of the object.
-  """
-  id: ID!
+    """
+    AnswerOrdering
+    """
+    orderBy: [AnswerOrdering]
+  ): AnswerConnection
+  case: Case
+  workItem: WorkItem
 }
 
 type DocumentConnection {
@@ -235,9 +447,56 @@ type DocumentEdge {
   cursor: String!
 }
 
+"""
+An enumeration.
+"""
+enum DocumentOrdering {
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
+}
+
 type FloatAnswer implements Answer & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
@@ -249,8 +508,10 @@ type FloatAnswer implements Answer & Node {
 }
 
 type FloatQuestion implements Question & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   isRequired: QuestionJexl!
@@ -262,6 +523,11 @@ type FloatQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
     slug: String
     name: String
     description: String
@@ -279,13 +545,17 @@ type FloatQuestion implements Question & Node {
 }
 
 type Flow implements Node {
-  task: Task!
-  next: FlowJexl!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
   """
   id: ID!
+  next: FlowJexl!
+  tasks: [Task]!
 }
 
 type FlowConnection {
@@ -306,13 +576,23 @@ type FlowEdge {
 }
 
 """
-Flow jexl represents a jexl expression returning a task slug.
+Flow jexl represents a jexl expression returning task slugs.
+
+Following transforms can be used:
+* task - return single task
+* tasks - return multiple tasks
+
+Examples:
+* 'task-slug'|task
+* ['task-slug1', 'task-slug2']|tasks
 """
 scalar FlowJexl
 
 type Form implements Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   name: String!
   description: String
@@ -331,6 +611,11 @@ type Form implements Node {
     isArchived: Boolean
     excludeForms: [ID]
     search: String
+
+    """
+    QuestionOrdering
+    """
+    orderBy: [QuestionOrdering]
   ): QuestionConnection
 
   """
@@ -356,9 +641,77 @@ type FormEdge {
   cursor: String!
 }
 
+"""
+An enumeration.
+"""
+enum FormOrdering {
+  """
+  Name
+  """
+  NAME_ASC
+
+  """
+  Name (descending)
+  """
+  NAME_DESC
+
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
+}
+
+"""
+Group jexl represents a jexl expression returning group names.
+
+Following transforms can be used:
+* groups - return list of group names
+
+Examples:
+* ['group-name1', 'group-name2']|groups
+"""
+scalar GroupJexl
+
 type IntegerAnswer implements Answer & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
@@ -370,8 +723,10 @@ type IntegerAnswer implements Answer & Node {
 }
 
 type IntegerQuestion implements Question & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   isRequired: QuestionJexl!
@@ -383,6 +738,11 @@ type IntegerQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
     slug: String
     name: String
     description: String
@@ -405,8 +765,10 @@ JSON String
 scalar JSONString
 
 type ListAnswer implements Answer & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
@@ -422,11 +784,21 @@ type Mutation {
   publishWorkflow(input: PublishWorkflowInput!): PublishWorkflowPayload
   archiveWorkflow(input: ArchiveWorkflowInput!): ArchiveWorkflowPayload
   addWorkflowFlow(input: AddWorkflowFlowInput!): AddWorkflowFlowPayload
-  removeWorkflowFlow(input: RemoveWorkflowFlowInput!): RemoveWorkflowFlowPayload
-  saveTask(input: SaveTaskInput!): SaveTaskPayload
+  removeFlow(input: RemoveFlowInput!): RemoveFlowPayload
+  saveSimpleTask(input: SaveSimpleTaskInput!): SaveSimpleTaskPayload
+  saveCompleteWorkflowFormTask(
+    input: SaveCompleteWorkflowFormTaskInput!
+  ): SaveCompleteWorkflowFormTaskPayload
+  saveCompleteTaskFormTask(
+    input: SaveCompleteTaskFormTaskInput!
+  ): SaveCompleteTaskFormTaskPayload
   archiveTask(input: ArchiveTaskInput!): ArchiveTaskPayload
   startCase(input: StartCaseInput!): StartCasePayload
+  cancelCase(input: CancelCaseInput!): CancelCasePayload
   completeWorkItem(input: CompleteWorkItemInput!): CompleteWorkItemPayload
+  setWorkItemAssignedUsers(
+    input: SetWorkItemAssignedUsersInput!
+  ): SetWorkItemAssignedUsersPayload
   saveForm(input: SaveFormInput!): SaveFormPayload
   archiveForm(input: ArchiveFormInput!): ArchiveFormPayload
   publishForm(input: PublishFormInput!): PublishFormPayload
@@ -449,6 +821,7 @@ type Mutation {
   saveIntegerQuestion(
     input: SaveIntegerQuestionInput!
   ): SaveIntegerQuestionPayload
+  saveTableQuestion(input: SaveTableQuestionInput!): SaveTableQuestionPayload
   archiveQuestion(input: ArchiveQuestionInput!): ArchiveQuestionPayload
   saveDocument(input: SaveDocumentInput!): SaveDocumentPayload
   saveDocumentStringAnswer(
@@ -463,6 +836,9 @@ type Mutation {
   saveDocumentListAnswer(
     input: SaveDocumentListAnswerInput!
   ): SaveDocumentListAnswerPayload
+  saveDocumentTableAnswer(
+    input: SaveDocumentTableAnswerInput!
+  ): SaveDocumentTableAnswerPayload
 }
 
 """
@@ -476,8 +852,10 @@ interface Node {
 }
 
 type Option implements Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   meta: JSONString!
@@ -503,6 +881,61 @@ type OptionEdge {
   A cursor for use in pagination
   """
   cursor: String!
+}
+
+"""
+An enumeration.
+"""
+enum OptionOrdering {
+  """
+  Label
+  """
+  LABEL_ASC
+
+  """
+  Label (descending)
+  """
+  LABEL_DESC
+
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
 }
 
 type PageInfo {
@@ -559,6 +992,11 @@ type Query {
     isPublished: Boolean
     isArchived: Boolean
     search: String
+
+    """
+    WorkflowOrdering
+    """
+    orderBy: [WorkflowOrdering]
   ): WorkflowConnection
   allTasks(
     before: String
@@ -568,9 +1006,18 @@ type Query {
     slug: String
     name: String
     description: String
-    type: String
+
+    """
+    TaskTypeArgument
+    """
+    type: TaskTypeArgument
     isArchived: Boolean
     search: String
+
+    """
+    TaskOrdering
+    """
+    orderBy: [TaskOrdering]
   ): TaskConnection
   allCases(
     before: String
@@ -578,14 +1025,32 @@ type Query {
     first: Int
     last: Int
     workflow: ID
-    status: String
+
+    """
+    CaseStatusArgument
+    """
+    status: CaseStatusArgument
+
+    """
+    CaseOrdering
+    """
+    orderBy: [CaseOrdering]
   ): CaseConnection
   allWorkItems(
     before: String
     after: String
     first: Int
     last: Int
-    status: String
+
+    """
+    WorkItemStatusArgument
+    """
+    status: WorkItemStatusArgument
+
+    """
+    WorkItemOrdering
+    """
+    orderBy: [WorkItemOrdering]
     task: ID
     case: ID
   ): WorkItemConnection
@@ -594,6 +1059,11 @@ type Query {
     after: String
     first: Int
     last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
     slug: String
     name: String
     description: String
@@ -606,6 +1076,11 @@ type Query {
     after: String
     first: Int
     last: Int
+
+    """
+    QuestionOrdering
+    """
+    orderBy: [QuestionOrdering]
     slug: String
     label: String
     isRequired: String
@@ -622,6 +1097,11 @@ type Query {
     form: ID
     search: String
     id: ID
+
+    """
+    DocumentOrdering
+    """
+    orderBy: [DocumentOrdering]
   ): DocumentConnection
 
   """
@@ -632,8 +1112,10 @@ type Query {
 
 interface Question {
   id: ID!
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   isRequired: QuestionJexl!
@@ -651,6 +1133,11 @@ interface Question {
     isPublished: Boolean
     isArchived: Boolean
     search: String
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
   ): FormConnection
 }
 
@@ -672,13 +1159,80 @@ type QuestionEdge {
 }
 
 """
-Question jexl represents a jexl expression returning boolean.
+Question jexl expression returning boolean.
+
+Following transform can be used:
+* answer - access answer of document by question slug
+* mapby - map list by key. Helpful to work with table answers
+  whereas an answer is a list of dicts.
+
+Examples:
+* 'answer' == 'question-slug'|answer
+* 'answer' in 'list-question-slug'|answer
+* 'answer' in 'table-question-slug'|answer|mapby('column-question')
 """
 scalar QuestionJexl
 
+"""
+An enumeration.
+"""
+enum QuestionOrdering {
+  """
+  Label
+  """
+  LABEL_ASC
+
+  """
+  Label (descending)
+  """
+  LABEL_DESC
+
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
+}
+
 type RadioQuestion implements Question & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   isRequired: QuestionJexl!
@@ -690,6 +1244,11 @@ type RadioQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
     slug: String
     name: String
     description: String
@@ -705,12 +1264,27 @@ type RadioQuestion implements Question & Node {
     slug: String
     label: String
     search: String
+
+    """
+    OptionOrdering
+    """
+    orderBy: [OptionOrdering]
   ): OptionConnection
 
   """
   The ID of the object.
   """
   id: ID!
+}
+
+input RemoveFlowInput {
+  flow: ID!
+  clientMutationId: String
+}
+
+type RemoveFlowPayload {
+  flow: Flow
+  clientMutationId: String
 }
 
 input RemoveFormQuestionInput {
@@ -730,17 +1304,6 @@ input RemoveOptionInput {
 }
 
 type RemoveOptionPayload {
-  clientMutationId: String
-}
-
-input RemoveWorkflowFlowInput {
-  workflow: ID!
-  task: ID!
-  clientMutationId: String
-}
-
-type RemoveWorkflowFlowPayload {
-  workflow: Workflow
   clientMutationId: String
 }
 
@@ -770,11 +1333,48 @@ type SaveCheckboxQuestionPayload {
   clientMutationId: String
 }
 
+input SaveCompleteTaskFormTaskInput {
+  slug: String!
+  name: String!
+  description: String
+  meta: JSONString
+
+  """
+  Group jexl returning what group(s) derived work items will be addressed to.
+  """
+  addressGroups: GroupJexl
+  form: ID!
+  clientMutationId: String
+}
+
+type SaveCompleteTaskFormTaskPayload {
+  task: Task
+  clientMutationId: String
+}
+
+input SaveCompleteWorkflowFormTaskInput {
+  slug: String!
+  name: String!
+  description: String
+  meta: JSONString
+
+  """
+  Group jexl returning what group(s) derived work items will be addressed to.
+  """
+  addressGroups: GroupJexl
+  clientMutationId: String
+}
+
+type SaveCompleteWorkflowFormTaskPayload {
+  task: Task
+  clientMutationId: String
+}
+
 input SaveDocumentFloatAnswerInput {
   question: ID!
   document: ID!
-  value: Float!
   meta: JSONString
+  value: Float!
   clientMutationId: String
 }
 
@@ -792,8 +1392,8 @@ input SaveDocumentInput {
 input SaveDocumentIntegerAnswerInput {
   question: ID!
   document: ID!
-  value: Int!
   meta: JSONString
+  value: Int!
   clientMutationId: String
 }
 
@@ -805,8 +1405,8 @@ type SaveDocumentIntegerAnswerPayload {
 input SaveDocumentListAnswerInput {
   question: ID!
   document: ID!
-  value: [String]!
   meta: JSONString
+  value: [String]!
   clientMutationId: String
 }
 
@@ -823,12 +1423,29 @@ type SaveDocumentPayload {
 input SaveDocumentStringAnswerInput {
   question: ID!
   document: ID!
-  value: String!
   meta: JSONString
+  value: String!
   clientMutationId: String
 }
 
 type SaveDocumentStringAnswerPayload {
+  answer: Answer
+  clientMutationId: String
+}
+
+input SaveDocumentTableAnswerInput {
+  question: ID!
+  document: ID!
+  meta: JSONString
+
+  """
+  List of document IDs representing the rows in the table.
+  """
+  value: [ID]!
+  clientMutationId: String
+}
+
+type SaveDocumentTableAnswerPayload {
   answer: Answer
   clientMutationId: String
 }
@@ -905,16 +1522,40 @@ type SaveRadioQuestionPayload {
   clientMutationId: String
 }
 
-input SaveTaskInput {
+input SaveSimpleTaskInput {
   slug: String!
   name: String!
   description: String
-  type: TaskType!
+  meta: JSONString
+
+  """
+  Group jexl returning what group(s) derived work items will be addressed to.
+  """
+  addressGroups: GroupJexl
   clientMutationId: String
 }
 
-type SaveTaskPayload {
+type SaveSimpleTaskPayload {
   task: Task
+  clientMutationId: String
+}
+
+input SaveTableQuestionInput {
+  slug: String!
+  label: String!
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
+  meta: JSONString
+
+  """
+  One row of table is represented by this form
+  """
+  rowForm: ID!
+  clientMutationId: String
+}
+
+type SaveTableQuestionPayload {
+  question: Question
   clientMutationId: String
 }
 
@@ -953,6 +1594,10 @@ input SaveWorkflowInput {
   name: String!
   description: String
   meta: JSONString
+
+  """
+  First task of the workflow.
+  """
   start: ID!
   form: ID
   clientMutationId: String
@@ -963,9 +1608,40 @@ type SaveWorkflowPayload {
   clientMutationId: String
 }
 
+input SetWorkItemAssignedUsersInput {
+  workItem: ID!
+  assignedUsers: [String]!
+  clientMutationId: String
+}
+
+type SetWorkItemAssignedUsersPayload {
+  workItem: WorkItem
+  clientMutationId: String
+}
+
+type SimpleTask implements Task & Node {
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+  slug: String!
+  name: String!
+  description: String
+  type: TaskType!
+  meta: JSONString!
+  addressGroups: GroupJexl
+  isArchived: Boolean!
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+}
+
 input StartCaseInput {
   workflow: ID!
   meta: JSONString
+  parentWorkItem: ID
   clientMutationId: String
 }
 
@@ -975,8 +1651,10 @@ type StartCasePayload {
 }
 
 type StringAnswer implements Answer & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
@@ -987,20 +1665,74 @@ type StringAnswer implements Answer & Node {
   meta: JSONString!
 }
 
-type Task implements Node {
-  created: DateTime!
-  modified: DateTime!
-  slug: String!
-  name: String!
-  description: String
-  type: TaskType!
-  meta: JSONString!
-  isArchived: Boolean!
+type TableAnswer implements Answer & Node {
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
   """
   id: ID!
+  question: Question!
+  value: [Document]!
+  meta: JSONString!
+  document: Document!
+}
+
+type TableQuestion implements Question & Node {
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+  slug: String!
+  label: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
+  isArchived: Boolean!
+  meta: JSONString!
+  forms(
+    before: String
+    after: String
+    first: Int
+    last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
+    slug: String
+    name: String
+    description: String
+    isPublished: Boolean
+    isArchived: Boolean
+    search: String
+  ): FormConnection
+
+  """
+  One row of table is represented by this form
+  """
+  rowForm: Form
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+}
+
+interface Task {
+  id: ID!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+  slug: String!
+  name: String!
+  description: String
+  isArchived: Boolean!
+  addressGroups: GroupJexl
+  meta: JSONString!
 }
 
 type TaskConnection {
@@ -1023,16 +1755,123 @@ type TaskEdge {
 """
 An enumeration.
 """
+enum TaskOrdering {
+  """
+  Name
+  """
+  NAME_ASC
+
+  """
+  Name (descending)
+  """
+  NAME_DESC
+
+  """
+  Description
+  """
+  DESCRIPTION_ASC
+
+  """
+  Description (descending)
+  """
+  DESCRIPTION_DESC
+
+  """
+  Type
+  """
+  TYPE_ASC
+
+  """
+  Type (descending)
+  """
+  TYPE_DESC
+
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
+}
+
+"""
+An enumeration.
+"""
 enum TaskType {
   """
   Task which can only be marked as completed.
   """
   SIMPLE
+
+  """
+  Task completing defined workflow form.
+  """
+  COMPLETE_WORKFLOW_FORM
+
+  """
+  Task completing defined task form.
+  """
+  COMPLETE_TASK_FORM
+}
+
+"""
+An enumeration.
+"""
+enum TaskTypeArgument {
+  """
+  Task which can only be marked as completed.
+  """
+  SIMPLE
+
+  """
+  Task completing defined workflow form.
+  """
+  COMPLETE_WORKFLOW_FORM
+
+  """
+  Task completing defined task form.
+  """
+  COMPLETE_TASK_FORM
 }
 
 type TextareaQuestion implements Question & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   isRequired: QuestionJexl!
@@ -1044,6 +1883,11 @@ type TextareaQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
     slug: String
     name: String
     description: String
@@ -1060,8 +1904,10 @@ type TextareaQuestion implements Question & Node {
 }
 
 type TextQuestion implements Question & Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   label: String!
   isRequired: QuestionJexl!
@@ -1073,6 +1919,11 @@ type TextQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
     slug: String
     name: String
     description: String
@@ -1089,8 +1940,10 @@ type TextQuestion implements Question & Node {
 }
 
 type Workflow implements Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
   slug: String!
   name: String!
   description: String
@@ -1130,18 +1983,101 @@ type WorkflowEdge {
   cursor: String!
 }
 
+"""
+An enumeration.
+"""
+enum WorkflowOrdering {
+  """
+  Name
+  """
+  NAME_ASC
+
+  """
+  Name (descending)
+  """
+  NAME_DESC
+
+  """
+  Description
+  """
+  DESCRIPTION_ASC
+
+  """
+  Description (descending)
+  """
+  DESCRIPTION_DESC
+
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
+}
+
 type WorkItem implements Node {
-  created: DateTime!
-  modified: DateTime!
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
 
   """
   The ID of the object.
   """
   id: ID!
   task: Task!
-  case: Case!
   status: WorkItemStatus!
   meta: JSONString!
+
+  """
+  Offer work item to be processed by a group of users, such are not committed to process it though.
+  """
+  addressedGroups: [String]!
+
+  """
+  Users responsible to undertake given work item.
+  """
+  assignedUsers: [String]!
+  case: Case!
+
+  """
+  Defines case of a sub-workflow
+  """
+  childCase: Case
+  document: Document
 }
 
 type WorkItemConnection {
@@ -1164,6 +2100,61 @@ type WorkItemEdge {
 """
 An enumeration.
 """
+enum WorkItemOrdering {
+  """
+  Status
+  """
+  STATUS_ASC
+
+  """
+  Status (descending)
+  """
+  STATUS_DESC
+
+  """
+  Created at
+  """
+  CREATED_AT_ASC
+
+  """
+  Created at (descending)
+  """
+  CREATED_AT_DESC
+
+  """
+  Modified at
+  """
+  MODIFIED_AT_ASC
+
+  """
+  Modified at (descending)
+  """
+  MODIFIED_AT_DESC
+
+  """
+  Created by user
+  """
+  CREATED_BY_USER_ASC
+
+  """
+  Created by user (descending)
+  """
+  CREATED_BY_USER_DESC
+
+  """
+  Created by group
+  """
+  CREATED_BY_GROUP_ASC
+
+  """
+  Created by group (descending)
+  """
+  CREATED_BY_GROUP_DESC
+}
+
+"""
+An enumeration.
+"""
 enum WorkItemStatus {
   """
   Task is ready to be processed.
@@ -1173,5 +2164,30 @@ enum WorkItemStatus {
   """
   Task is done.
   """
-  COMPLETE
+  COMPLETED
+
+  """
+  Task is cancelled.
+  """
+  CANCELED
+}
+
+"""
+An enumeration.
+"""
+enum WorkItemStatusArgument {
+  """
+  Task is ready to be processed.
+  """
+  READY
+
+  """
+  Task is done.
+  """
+  COMPLETED
+
+  """
+  Task is cancelled.
+  """
+  CANCELED
 }

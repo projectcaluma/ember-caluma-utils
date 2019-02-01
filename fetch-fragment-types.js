@@ -33,6 +33,11 @@ fetch("http://localhost:8000/graphql", {
     result.data.__schema.types = filteredData;
     fs.writeFile(
       "addon/-private/fragment-types.js",
-      `export default ${JSON.stringify(result.data, null, 2)}`
+      `export default ${JSON.stringify(result.data, null, 2)}`,
+      err => {
+        if (err) throw err;
+        // eslint-disable-next-line no-console
+        console.log("The file has been saved!");
+      }
     );
   });
