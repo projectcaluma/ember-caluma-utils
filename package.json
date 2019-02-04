@@ -69,7 +69,7 @@
     "loader.js": "4.7.0",
     "node-fetch": "2.3.0",
     "prettier": "1.16.4",
-    "qunit-dom": "0.8.0"
+    "qunit-dom": "0.8.4"
   },
   "resolutions": {
     "//": "Needed till https://github.com/salesforce/tough-cookie/issues/140 is fixed or Node 6 is end of life",
