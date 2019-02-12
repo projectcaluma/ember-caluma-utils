@@ -1,5 +1,5 @@
 # source: http://localhost:8000/graphql
-# timestamp: Thu Jan 31 2019 15:43:42 GMT+0100 (Central European Standard Time)
+# timestamp: Tue Feb 12 2019 09:39:36 GMT+0100 (CET)
 
 input AddFormQuestionInput {
   form: ID!
@@ -97,46 +97,6 @@ enum AnswerOrdering {
   Created by group (descending)
   """
   CREATED_BY_GROUP_DESC
-}
-
-input ArchiveFormInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type ArchiveFormPayload {
-  form: Form
-  clientMutationId: String
-}
-
-input ArchiveQuestionInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type ArchiveQuestionPayload {
-  question: Question
-  clientMutationId: String
-}
-
-input ArchiveTaskInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type ArchiveTaskPayload {
-  task: Task
-  clientMutationId: String
-}
-
-input ArchiveWorkflowInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type ArchiveWorkflowPayload {
-  workflow: Workflow
-  clientMutationId: String
 }
 
 input CancelCaseInput {
@@ -296,7 +256,7 @@ enum CaseStatusArgument {
   CANCELED
 }
 
-type CheckboxQuestion implements Question & Node {
+type ChoiceQuestion implements Question & Node {
   createdAt: DateTime!
   modifiedAt: DateTime!
   createdByUser: String
@@ -307,6 +267,7 @@ type CheckboxQuestion implements Question & Node {
   isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString!
+  source: Question
   forms(
     before: String
     after: String
@@ -329,14 +290,14 @@ type CheckboxQuestion implements Question & Node {
     after: String
     first: Int
     last: Int
+    slug: String
+    label: String
+    search: String
 
     """
     OptionOrdering
     """
     orderBy: [OptionOrdering]
-    slug: String
-    label: String
-    search: String
   ): OptionConnection
 
   """
@@ -391,6 +352,43 @@ input CompleteWorkItemInput {
 
 type CompleteWorkItemPayload {
   workItem: WorkItem
+  clientMutationId: String
+}
+
+input CopyFormInput {
+  slug: String!
+  name: String!
+  description: String
+  source: ID!
+  clientMutationId: String
+}
+
+type CopyFormPayload {
+  form: Form
+  clientMutationId: String
+}
+
+input CopyOptionInput {
+  slug: String!
+  label: String!
+  source: ID!
+  clientMutationId: String
+}
+
+type CopyOptionPayload {
+  option: Option
+  clientMutationId: String
+}
+
+input CopyQuestionInput {
+  slug: String!
+  label: String!
+  source: ID!
+  clientMutationId: String
+}
+
+type CopyQuestionPayload {
+  question: Question
   clientMutationId: String
 }
 
@@ -518,6 +516,7 @@ type FloatQuestion implements Question & Node {
   isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString!
+  source: Question
   forms(
     before: String
     after: String
@@ -617,6 +616,11 @@ type Form implements Node {
     """
     orderBy: [QuestionOrdering]
   ): QuestionConnection
+
+  """
+  Reference this form has been copied from
+  """
+  source: Form
 
   """
   The ID of the object.
@@ -733,6 +737,7 @@ type IntegerQuestion implements Question & Node {
   isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString!
+  source: Question
   forms(
     before: String
     after: String
@@ -779,10 +784,58 @@ type ListAnswer implements Answer & Node {
   meta: JSONString!
 }
 
+type MultipleChoiceQuestion implements Question & Node {
+  createdAt: DateTime!
+  modifiedAt: DateTime!
+  createdByUser: String
+  createdByGroup: String
+  slug: String!
+  label: String!
+  isRequired: QuestionJexl!
+  isHidden: QuestionJexl!
+  isArchived: Boolean!
+  meta: JSONString!
+  source: Question
+  forms(
+    before: String
+    after: String
+    first: Int
+    last: Int
+
+    """
+    FormOrdering
+    """
+    orderBy: [FormOrdering]
+    slug: String
+    name: String
+    description: String
+    isPublished: Boolean
+    isArchived: Boolean
+    search: String
+  ): FormConnection
+  options(
+    before: String
+    after: String
+    first: Int
+    last: Int
+
+    """
+    OptionOrdering
+    """
+    orderBy: [OptionOrdering]
+    slug: String
+    label: String
+    search: String
+  ): OptionConnection
+
+  """
+  The ID of the object.
+  """
+  id: ID!
+}
+
 type Mutation {
   saveWorkflow(input: SaveWorkflowInput!): SaveWorkflowPayload
-  publishWorkflow(input: PublishWorkflowInput!): PublishWorkflowPayload
-  archiveWorkflow(input: ArchiveWorkflowInput!): ArchiveWorkflowPayload
   addWorkflowFlow(input: AddWorkflowFlowInput!): AddWorkflowFlowPayload
   removeFlow(input: RemoveFlowInput!): RemoveFlowPayload
   saveSimpleTask(input: SaveSimpleTaskInput!): SaveSimpleTaskPayload
@@ -792,7 +845,6 @@ type Mutation {
   saveCompleteTaskFormTask(
     input: SaveCompleteTaskFormTaskInput!
   ): SaveCompleteTaskFormTaskPayload
-  archiveTask(input: ArchiveTaskInput!): ArchiveTaskPayload
   startCase(input: StartCaseInput!): StartCasePayload
   cancelCase(input: CancelCaseInput!): CancelCasePayload
   completeWorkItem(input: CompleteWorkItemInput!): CompleteWorkItemPayload
@@ -800,8 +852,7 @@ type Mutation {
     input: SetWorkItemAssignedUsersInput!
   ): SetWorkItemAssignedUsersPayload
   saveForm(input: SaveFormInput!): SaveFormPayload
-  archiveForm(input: ArchiveFormInput!): ArchiveFormPayload
-  publishForm(input: PublishFormInput!): PublishFormPayload
+  copyForm(input: CopyFormInput!): CopyFormPayload
   addFormQuestion(input: AddFormQuestionInput!): AddFormQuestionPayload
   removeFormQuestion(input: RemoveFormQuestionInput!): RemoveFormQuestionPayload
   reorderFormQuestions(
@@ -809,20 +860,21 @@ type Mutation {
   ): ReorderFormQuestionsPayload
   saveOption(input: SaveOptionInput!): SaveOptionPayload
   removeOption(input: RemoveOptionInput!): RemoveOptionPayload
+  copyOption(input: CopyOptionInput!): CopyOptionPayload
+  copyQuestion(input: CopyQuestionInput!): CopyQuestionPayload
   saveTextQuestion(input: SaveTextQuestionInput!): SaveTextQuestionPayload
   saveTextareaQuestion(
     input: SaveTextareaQuestionInput!
   ): SaveTextareaQuestionPayload
-  saveRadioQuestion(input: SaveRadioQuestionInput!): SaveRadioQuestionPayload
-  saveCheckboxQuestion(
-    input: SaveCheckboxQuestionInput!
-  ): SaveCheckboxQuestionPayload
+  saveChoiceQuestion(input: SaveChoiceQuestionInput!): SaveChoiceQuestionPayload
+  saveMultipleChoiceQuestion(
+    input: SaveMultipleChoiceQuestionInput!
+  ): SaveMultipleChoiceQuestionPayload
   saveFloatQuestion(input: SaveFloatQuestionInput!): SaveFloatQuestionPayload
   saveIntegerQuestion(
     input: SaveIntegerQuestionInput!
   ): SaveIntegerQuestionPayload
   saveTableQuestion(input: SaveTableQuestionInput!): SaveTableQuestionPayload
-  archiveQuestion(input: ArchiveQuestionInput!): ArchiveQuestionPayload
   saveDocument(input: SaveDocumentInput!): SaveDocumentPayload
   saveDocumentStringAnswer(
     input: SaveDocumentStringAnswerInput!
@@ -859,6 +911,11 @@ type Option implements Node {
   slug: String!
   label: String!
   meta: JSONString!
+
+  """
+  Reference this option has been copied from
+  """
+  source: Option
 
   """
   The ID of the object.
@@ -958,26 +1015,6 @@ type PageInfo {
   When paginating forwards, the cursor to continue.
   """
   endCursor: String
-}
-
-input PublishFormInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type PublishFormPayload {
-  form: Form
-  clientMutationId: String
-}
-
-input PublishWorkflowInput {
-  id: ID!
-  clientMutationId: String
-}
-
-type PublishWorkflowPayload {
-  workflow: Workflow
-  clientMutationId: String
 }
 
 type Query {
@@ -1139,6 +1176,7 @@ interface Question {
     """
     orderBy: [FormOrdering]
   ): FormConnection
+  source: Question
 }
 
 type QuestionConnection {
@@ -1228,55 +1266,6 @@ enum QuestionOrdering {
   CREATED_BY_GROUP_DESC
 }
 
-type RadioQuestion implements Question & Node {
-  createdAt: DateTime!
-  modifiedAt: DateTime!
-  createdByUser: String
-  createdByGroup: String
-  slug: String!
-  label: String!
-  isRequired: QuestionJexl!
-  isHidden: QuestionJexl!
-  isArchived: Boolean!
-  meta: JSONString!
-  forms(
-    before: String
-    after: String
-    first: Int
-    last: Int
-
-    """
-    FormOrdering
-    """
-    orderBy: [FormOrdering]
-    slug: String
-    name: String
-    description: String
-    isPublished: Boolean
-    isArchived: Boolean
-    search: String
-  ): FormConnection
-  options(
-    before: String
-    after: String
-    first: Int
-    last: Int
-    slug: String
-    label: String
-    search: String
-
-    """
-    OptionOrdering
-    """
-    orderBy: [OptionOrdering]
-  ): OptionConnection
-
-  """
-  The ID of the object.
-  """
-  id: ID!
-}
-
 input RemoveFlowInput {
   flow: ID!
   clientMutationId: String
@@ -1318,17 +1307,18 @@ type ReorderFormQuestionsPayload {
   clientMutationId: String
 }
 
-input SaveCheckboxQuestionInput {
+input SaveChoiceQuestionInput {
   slug: String!
   label: String!
   isRequired: QuestionJexl
   isHidden: QuestionJexl
   meta: JSONString
+  isArchived: Boolean
   options: [ID]!
   clientMutationId: String
 }
 
-type SaveCheckboxQuestionPayload {
+type SaveChoiceQuestionPayload {
   question: Question
   clientMutationId: String
 }
@@ -1343,6 +1333,7 @@ input SaveCompleteTaskFormTaskInput {
   Group jexl returning what group(s) derived work items will be addressed to.
   """
   addressGroups: GroupJexl
+  isArchived: Boolean
   form: ID!
   clientMutationId: String
 }
@@ -1362,6 +1353,7 @@ input SaveCompleteWorkflowFormTaskInput {
   Group jexl returning what group(s) derived work items will be addressed to.
   """
   addressGroups: GroupJexl
+  isArchived: Boolean
   clientMutationId: String
 }
 
@@ -1456,6 +1448,7 @@ input SaveFloatQuestionInput {
   isRequired: QuestionJexl
   isHidden: QuestionJexl
   meta: JSONString
+  isArchived: Boolean
   minValue: Float
   maxValue: Float
   clientMutationId: String
@@ -1471,6 +1464,8 @@ input SaveFormInput {
   name: String!
   description: String
   meta: JSONString
+  isArchived: Boolean
+  isPublished: Boolean
   clientMutationId: String
 }
 
@@ -1485,12 +1480,29 @@ input SaveIntegerQuestionInput {
   isRequired: QuestionJexl
   isHidden: QuestionJexl
   meta: JSONString
+  isArchived: Boolean
   minValue: Int
   maxValue: Int
   clientMutationId: String
 }
 
 type SaveIntegerQuestionPayload {
+  question: Question
+  clientMutationId: String
+}
+
+input SaveMultipleChoiceQuestionInput {
+  slug: String!
+  label: String!
+  isRequired: QuestionJexl
+  isHidden: QuestionJexl
+  meta: JSONString
+  isArchived: Boolean
+  options: [ID]!
+  clientMutationId: String
+}
+
+type SaveMultipleChoiceQuestionPayload {
   question: Question
   clientMutationId: String
 }
@@ -1507,21 +1519,6 @@ type SaveOptionPayload {
   clientMutationId: String
 }
 
-input SaveRadioQuestionInput {
-  slug: String!
-  label: String!
-  isRequired: QuestionJexl
-  isHidden: QuestionJexl
-  meta: JSONString
-  options: [ID]!
-  clientMutationId: String
-}
-
-type SaveRadioQuestionPayload {
-  question: Question
-  clientMutationId: String
-}
-
 input SaveSimpleTaskInput {
   slug: String!
   name: String!
@@ -1532,6 +1529,7 @@ input SaveSimpleTaskInput {
   Group jexl returning what group(s) derived work items will be addressed to.
   """
   addressGroups: GroupJexl
+  isArchived: Boolean
   clientMutationId: String
 }
 
@@ -1546,6 +1544,7 @@ input SaveTableQuestionInput {
   isRequired: QuestionJexl
   isHidden: QuestionJexl
   meta: JSONString
+  isArchived: Boolean
 
   """
   One row of table is represented by this form
@@ -1565,6 +1564,7 @@ input SaveTextareaQuestionInput {
   isRequired: QuestionJexl
   isHidden: QuestionJexl
   meta: JSONString
+  isArchived: Boolean
   maxLength: Int
   clientMutationId: String
 }
@@ -1580,6 +1580,7 @@ input SaveTextQuestionInput {
   isRequired: QuestionJexl
   isHidden: QuestionJexl
   meta: JSONString
+  isArchived: Boolean
   maxLength: Int
   clientMutationId: String
 }
@@ -1596,10 +1597,21 @@ input SaveWorkflowInput {
   meta: JSONString
 
   """
-  First task of the workflow.
+  Starting task(s) of the workflow.
   """
-  start: ID!
-  form: ID
+  startTasks: [ID]!
+
+  """
+  Allow workflow to be started with any form
+  """
+  allowAllForms: Boolean
+
+  """
+  List of forms which are allowed to start workflow with
+  """
+  allowForms: [ID]
+  isArchived: Boolean
+  isPublished: Boolean
   clientMutationId: String
 }
 
@@ -1642,6 +1654,7 @@ input StartCaseInput {
   workflow: ID!
   meta: JSONString
   parentWorkItem: ID
+  form: ID
   clientMutationId: String
 }
 
@@ -1692,6 +1705,7 @@ type TableQuestion implements Question & Node {
   isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString!
+  source: Question
   forms(
     before: String
     after: String
@@ -1878,6 +1892,7 @@ type TextareaQuestion implements Question & Node {
   isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString!
+  source: Question
   forms(
     before: String
     after: String
@@ -1914,6 +1929,7 @@ type TextQuestion implements Question & Node {
   isHidden: QuestionJexl!
   isArchived: Boolean!
   meta: JSONString!
+  source: Question
   forms(
     before: String
     after: String
@@ -1950,8 +1966,18 @@ type Workflow implements Node {
   meta: JSONString!
   isPublished: Boolean!
   isArchived: Boolean!
-  start: Task!
-  form: Form
+  startTasks: [Task]!
+
+  """
+  Allow workflow to be started with any form
+  """
+  allowAllForms: Boolean!
+  allowForms(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): FormConnection
 
   """
   The ID of the object.

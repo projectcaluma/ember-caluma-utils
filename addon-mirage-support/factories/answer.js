@@ -43,7 +43,7 @@ export default Factory.extend({
           })
         });
       }
-    } else if (answer.question.type === "CHECKBOX") {
+    } else if (answer.question.type === "MULTIPLE_CHOICE") {
       answer.update({
         type: "LIST"
       });
@@ -55,7 +55,7 @@ export default Factory.extend({
           ]
         });
       }
-    } else if (answer.question.type === "RADIO") {
+    } else if (answer.question.type === "CHOICE") {
       answer.update({
         type: "STRING"
       });

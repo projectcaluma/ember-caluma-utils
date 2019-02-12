@@ -1,6 +1,13 @@
 import { Factory, faker } from "ember-cli-mirage";
 
-const TYPES = ["TEXT", "TEXTAREA", "INTEGER", "FLOAT", "CHECKBOX", "RADIO"];
+const TYPES = [
+  "TEXT",
+  "TEXTAREA",
+  "INTEGER",
+  "FLOAT",
+  "MULTIPLE_CHOICE",
+  "CHOICE"
+];
 
 export default Factory.extend({
   slug: i => `question-${i + 1}`,
@@ -33,7 +40,7 @@ export default Factory.extend({
           })
         });
       }
-    } else if (["CHECKBOX", "RADIO"].includes(question.type)) {
+    } else if (["MULTIPLE_CHOICE", "CHOICE"].includes(question.type)) {
       if (question.optionIds.length === 0) {
         const options = server.createList("option", 3);
 

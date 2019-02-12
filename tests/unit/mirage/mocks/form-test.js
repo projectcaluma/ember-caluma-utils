@@ -49,52 +49,6 @@ module("Unit | Mirage GraphQL Mock | form", function(hooks) {
     ]);
   });
 
-  test("can archive form", async function(assert) {
-    assert.expect(1);
-
-    const res = await this.apollo.mutate({
-      mutation: gql`
-        mutation ArchiveForm($input: ArchiveFormInput!) {
-          archiveForm(input: $input) {
-            form {
-              isArchived
-            }
-          }
-        }
-      `,
-      variables: {
-        input: {
-          id: "test-form"
-        }
-      }
-    });
-
-    assert.ok(res.archiveForm.form.isArchived);
-  });
-
-  test("can publish form", async function(assert) {
-    assert.expect(1);
-
-    const res = await this.apollo.mutate({
-      mutation: gql`
-        mutation PublishForm($input: PublishFormInput!) {
-          publishForm(input: $input) {
-            form {
-              isPublished
-            }
-          }
-        }
-      `,
-      variables: {
-        input: {
-          id: "test-form"
-        }
-      }
-    });
-
-    assert.ok(res.publishForm.form.isPublished);
-  });
-
   test("can reorder questions", async function(assert) {
     assert.expect(1);
 

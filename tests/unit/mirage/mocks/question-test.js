@@ -273,7 +273,7 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
     const res = await this.apollo.mutate({
       mutation: gql`
         mutation {
-          saveRadioQuestion(
+          saveChoiceQuestion(
             input: {
               slug: "test-question",
               label: "Test Question",
@@ -283,7 +283,7 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
             question {
               slug
               label
-              ... on RadioQuestion {
+              ... on ChoiceQuestion {
                 options {
                   edges {
                     node {
@@ -298,8 +298,8 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
       `
     });
 
-    assert.deepEqual(res.saveRadioQuestion.question, {
-      __typename: "RadioQuestion",
+    assert.deepEqual(res.saveChoiceQuestion.question, {
+      __typename: "ChoiceQuestion",
       slug: "test-question",
       label: "Test Question",
       options: {
@@ -323,7 +323,7 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
     const res = await this.apollo.mutate({
       mutation: gql`
         mutation {
-          saveCheckboxQuestion(
+          saveMultipleChoiceQuestion(
             input: {
               slug: "test-question",
               label: "Test Question",
@@ -333,7 +333,7 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
             question {
               slug
               label
-              ... on CheckboxQuestion {
+              ... on MultipleChoiceQuestion {
                 options {
                   edges {
                     node {
@@ -348,8 +348,8 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
       `
     });
 
-    assert.deepEqual(res.saveCheckboxQuestion.question, {
-      __typename: "CheckboxQuestion",
+    assert.deepEqual(res.saveMultipleChoiceQuestion.question, {
+      __typename: "MultipleChoiceQuestion",
       slug: "test-question",
       label: "Test Question",
 
@@ -388,11 +388,11 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
       formIds: [form.id]
     });
     const checkboxQuestion = this.server.create("question", {
-      type: "CHECKBOX",
+      type: "MULTIPLE_CHOICE",
       formIds: [form.id]
     });
     const radioQuestion = this.server.create("question", {
-      type: "RADIO",
+      type: "CHOICE",
       formIds: [form.id]
     });
 
@@ -504,7 +504,7 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
         node: {
           __typename: "ListAnswer",
           question: {
-            __typename: "CheckboxQuestion",
+            __typename: "MultipleChoiceQuestion",
             slug: "question-8"
           }
         }
@@ -514,7 +514,7 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
         node: {
           __typename: "StringAnswer",
           question: {
-            __typename: "RadioQuestion",
+            __typename: "ChoiceQuestion",
             slug: "question-9"
           }
         }
@@ -553,14 +553,14 @@ module("Unit | Mirage GraphQL Mock | question", function(hooks) {
       {
         __typename: "QuestionEdge",
         node: {
-          __typename: "CheckboxQuestion",
+          __typename: "MultipleChoiceQuestion",
           slug: "question-8"
         }
       },
       {
         __typename: "QuestionEdge",
         node: {
-          __typename: "RadioQuestion",
+          __typename: "ChoiceQuestion",
           slug: "question-9"
         }
       }
