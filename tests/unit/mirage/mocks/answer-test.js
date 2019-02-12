@@ -29,12 +29,12 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
       type: "FLOAT",
       formIds: [formId]
     });
-    const checkboxQuestion = this.server.create("question", {
-      type: "CHECKBOX",
+    const multipleChoiceQuestion = this.server.create("question", {
+      type: "MULTIPLE_CHOICE",
       formIds: [formId]
     });
-    const radioQuestion = this.server.create("question", {
-      type: "RADIO",
+    const choiceQuestion = this.server.create("question", {
+      type: "CHOICE",
       formIds: [formId]
     });
 
@@ -54,12 +54,12 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
       questionId: floatQuestion.id,
       documentId
     });
-    this.checkboxAnswer = this.server.create("answer", {
-      questionId: checkboxQuestion.id,
+    this.multipleChoiceAnswer = this.server.create("answer", {
+      questionId: multipleChoiceQuestion.id,
       documentId
     });
-    this.radioAnswer = this.server.create("answer", {
-      questionId: radioQuestion.id,
+    this.choiceAnswer = this.server.create("answer", {
+      questionId: choiceQuestion.id,
       documentId
     });
 
@@ -134,14 +134,14 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
         __typename: "AnswerEdge",
         node: {
           __typename: "ListAnswer",
-          listValue: this.checkboxAnswer.value
+          listValue: this.multipleChoiceAnswer.value
         }
       },
       {
         __typename: "AnswerEdge",
         node: {
           __typename: "StringAnswer",
-          stringValue: this.radioAnswer.value
+          stringValue: this.choiceAnswer.value
         }
       }
     ]);
@@ -269,7 +269,7 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
 
     const f = this.server.create("form");
     const q = this.server.create("question", {
-      type: "CHECKBOX",
+      type: "MULTIPLE_CHOICE",
       formIds: [f.id]
     });
     const d = this.server.create("document", { formId: f.id });
@@ -302,7 +302,7 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
       __typename: "ListAnswer",
       question: {
         slug: q.slug,
-        __typename: "CheckboxQuestion"
+        __typename: "MultipleChoiceQuestion"
       }
     });
   });
@@ -312,7 +312,7 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
 
     const f = this.server.create("form");
     const q = this.server.create("question", {
-      type: "CHECKBOX",
+      type: "MULTIPLE_CHOICE",
       formIds: [f.id]
     });
     const d = this.server.create("document", { formId: f.id });
@@ -350,7 +350,7 @@ module("Unit | Mirage GraphQL Mock | answer", function(hooks) {
       __typename: "ListAnswer",
       question: {
         slug: q.slug,
-        __typename: "CheckboxQuestion"
+        __typename: "MultipleChoiceQuestion"
       }
     });
   });

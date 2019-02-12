@@ -56,13 +56,13 @@ export default class extends BaseMock {
     return this.handleInterfaceType(...arguments);
   }
 
-  @register("CheckboxQuestion")
-  handleChecboxQuestion() {
+  @register("MultipleChoiceQuestion")
+  handleMultipleChoiceQuestion() {
     return this.handleInterfaceType(...arguments);
   }
 
-  @register("RadioQuestion")
-  handleRadioQuestion() {
+  @register("ChoiceQuestion")
+  handleChoiceQuestion() {
     return this.handleInterfaceType(...arguments);
   }
 
@@ -94,15 +94,15 @@ export default class extends BaseMock {
     });
   }
 
-  @register("SaveRadioQuestionPayload")
-  handleSaveRadioQuestion(_, { input }) {
+  @register("SaveChoiceQuestionPayload")
+  handleSaveChoiceQuestion(_, { input }) {
     const options = input.options.map(slug =>
       optionFilter.find(this.db.options, { slug })
     );
     const optionIds = options.map(({ id }) => String(id));
 
     const res = this.handleSavePayload.fn.call(this, _, {
-      input: { ...input, options, optionIds, type: "RADIO" }
+      input: { ...input, options, optionIds, type: "CHOICE" }
     });
 
     Object.assign(res.question, {
@@ -118,15 +118,15 @@ export default class extends BaseMock {
     return res;
   }
 
-  @register("SaveCheckboxQuestionPayload")
-  handleSaveCheckboxQuestion(_, { input }) {
+  @register("SaveMultipleChoiceQuestionPayload")
+  handleSaveMultipleChoiceQuestion(_, { input }) {
     const options = input.options.map(slug =>
       optionFilter.find(this.db.options, { slug })
     );
     const optionIds = options.map(({ id }) => String(id));
 
     const res = this.handleSavePayload.fn.call(this, _, {
-      input: { ...input, options, optionIds, type: "CHECKBOX" }
+      input: { ...input, options, optionIds, type: "MULTIPLE_CHOICE" }
     });
 
     Object.assign(res.question, {

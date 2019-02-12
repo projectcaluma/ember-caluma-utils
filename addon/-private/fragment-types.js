@@ -30,10 +30,10 @@ export default {
             name: "TextQuestion"
           },
           {
-            name: "RadioQuestion"
+            name: "ChoiceQuestion"
           },
           {
-            name: "CheckboxQuestion"
+            name: "MultipleChoiceQuestion"
           },
           {
             name: "TextareaQuestion"
@@ -96,10 +96,10 @@ export default {
             name: "TextQuestion"
           },
           {
-            name: "RadioQuestion"
+            name: "ChoiceQuestion"
           },
           {
-            name: "CheckboxQuestion"
+            name: "MultipleChoiceQuestion"
           },
           {
             name: "TextareaQuestion"

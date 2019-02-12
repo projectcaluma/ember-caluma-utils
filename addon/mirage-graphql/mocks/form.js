@@ -10,38 +10,6 @@ const questionSerializer = new Serializer("Question");
 const questionFilter = new Filter("Question");
 
 export default class extends BaseMock {
-  @register("ArchiveFormPayload")
-  handleArchiveForm(
-    _,
-    {
-      input: { id: slug, clientMutationId }
-    }
-  ) {
-    const form = this.filter.find(this.collection, { slug });
-    const res = this.collection.update(form.id, { isArchived: true });
-
-    return {
-      form: this.serializer.serialize(res),
-      clientMutationId
-    };
-  }
-
-  @register("PublishFormPayload")
-  handlePublishForm(
-    _,
-    {
-      input: { id: slug, clientMutationId }
-    }
-  ) {
-    const form = this.filter.find(this.collection, { slug });
-    const res = this.collection.update(form.id, { isPublished: true });
-
-    return {
-      form: this.serializer.serialize(res),
-      clientMutationId
-    };
-  }
-
   @register("ReorderFormQuestionsPayload")
   handleReorderFormQuestions(
     root,
