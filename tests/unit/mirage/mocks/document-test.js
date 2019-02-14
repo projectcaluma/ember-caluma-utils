@@ -26,6 +26,10 @@ module("Unit | Mirage GraphQL Mock | document", function(hooks) {
             edges {
               node {
                 id
+                form {
+                  slug
+                  name
+                }
               }
             }
           }

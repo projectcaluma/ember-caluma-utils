@@ -15,7 +15,8 @@ module("Unit | Mirage GraphQL Mock | work item", function(hooks) {
     const { id: caseId } = this.server.create("case", {
       documentId
     });
-    this.workItem = this.server.create("workItem", { caseId });
+    const { id: taskId } = this.server.create("task");
+    this.workItem = this.server.create("workItem", { caseId, taskId });
     this.caseId = caseId;
 
     this.apollo = this.owner.lookup("service:apollo");
@@ -34,6 +35,9 @@ module("Unit | Mirage GraphQL Mock | work item", function(hooks) {
                 createdAt
                 createdByUser
                 status
+                task {
+                  name
+                }
               }
             }
           }
@@ -46,7 +50,10 @@ module("Unit | Mirage GraphQL Mock | work item", function(hooks) {
       id: window.btoa("WorkItem:" + this.workItem.id),
       status: this.workItem.status,
       createdByUser: this.workItem.createdByUser,
-      createdAt: this.workItem.createdAt.toISOString()
+      createdAt: this.workItem.createdAt.toISOString(),
+      task: {
+        __typename: this.workItem.task.type
+      }
     });
   });
 });
