@@ -64,7 +64,7 @@
     "eslint-plugin-ember": "5.4.0",
     "eslint-plugin-node": "8.0.1",
     "eslint-plugin-prettier": "2.6.0",
-    "graphql-cli": "3.0.9",
+    "graphql-cli": "3.0.11",
     "graphql-tag": "2.10.1",
     "loader.js": "4.7.0",
     "node-fetch": "2.3.0",
