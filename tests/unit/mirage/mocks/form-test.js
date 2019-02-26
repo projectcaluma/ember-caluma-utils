@@ -19,9 +19,16 @@ module("Unit | Mirage GraphQL Mock | form", function(hooks) {
   test("can filter archived forms", async function(assert) {
     assert.expect(1);
 
-    this.server.create("form", {
+    this.form = this.server.create("form", {
       slug: "archived-form",
       isArchived: true
+    });
+    this.form.update({
+      questions: [
+        this.server.create("question", { slug: "question-1", type: "TEXT" }),
+        this.server.create("question", { slug: "question-2", type: "TEXT" }),
+        this.server.create("question", { slug: "question-3", type: "TEXT" })
+      ]
     });
 
     const res = await this.apollo.query({
