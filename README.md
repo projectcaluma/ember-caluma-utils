@@ -1,3 +1,7 @@
+# ⚠ Deprecation warning
+
+This addon is deprecated, since it has been integrated in [ember-caluma](https://github.com/projectcaluma/ember-caluma).
+
 # ember-caluma-utils
 
 This addon provides some common utilities for Ember.js-based frontends for Caluma.
