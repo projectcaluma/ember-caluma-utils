@@ -2,15 +2,13 @@ import BaseMock from "ember-caluma-utils/mirage-graphql/mocks/base";
 import { register } from "ember-caluma-utils/mirage-graphql";
 import { classify } from "@ember/string";
 import { atob } from "ember-caluma-utils/helpers/atob";
-import { camelize, dasherize } from "@ember/string";
-import { MockList } from "graphql-tools";
 
 export default class extends BaseMock {
   @register("Task")
   handleTask(root, vars) {
     const serialized = this.handle.fn.call(this, root, vars);
 
-    let taskId = root.taskId || (root.node && root.node(...arguments).id);
+    let taskId = atob(root.taskId || (root.node && root.node(...arguments).id));
     let __typename = root.__typename;
 
     if (taskId) {
@@ -37,12 +35,12 @@ export default class extends BaseMock {
     return this.handleInterfaceType(...arguments);
   }
 
-  @register("CompleteWorkflowForm")
+  @register("CompleteWorkflowFormTask")
   handleCompleteWorkflowForm() {
     return this.handleInterfaceType(...arguments);
   }
 
-  @register("CompleteTaskForm")
+  @register("CompleteTaskFormTask")
   handleCompleteTaskForm() {
     return this.handleInterfaceType(...arguments);
   }

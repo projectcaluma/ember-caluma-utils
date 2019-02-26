@@ -39,7 +39,12 @@ module("Unit | Mirage GraphQL Mock | document", function(hooks) {
 
     assert.deepEqual(res.allDocuments.edges[0].node, {
       __typename: "Document",
-      id: window.btoa("Document:" + this.document.id)
+      id: window.btoa("Document:" + this.document.id),
+      form: {
+        __typename: "Form",
+        name: this.document.form.name,
+        slug: this.document.form.slug
+      }
     });
   });
 });

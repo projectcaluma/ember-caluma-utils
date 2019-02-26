@@ -2,6 +2,7 @@ import { module, test } from "qunit";
 import { setupTest } from "ember-qunit";
 import setupMirage from "ember-cli-mirage/test-support/setup-mirage";
 import gql from "graphql-tag";
+import { classify } from "@ember/string";
 
 module("Unit | Mirage GraphQL Mock | work item", function(hooks) {
   setupTest(hooks);
@@ -52,7 +53,8 @@ module("Unit | Mirage GraphQL Mock | work item", function(hooks) {
       createdByUser: this.workItem.createdByUser,
       createdAt: this.workItem.createdAt.toISOString(),
       task: {
-        __typename: this.workItem.task.type
+        __typename: `${classify(this.workItem.task.type.toLowerCase())}Task`,
+        name: this.workItem.task.name
       }
     });
   });
