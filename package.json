@@ -29,7 +29,7 @@
     "ember-auto-import": "1.2.19",
     "ember-changeset": "1.5.0",
     "ember-cli-babel": "6.17.2",
-    "ember-fetch": "6.1.0",
+    "ember-fetch": "6.5.0",
     "graphql": "14.1.1",
     "graphql-iso-date": "3.6.1",
     "graphql-tools": "4.0.4",
